@@ -1,66 +1,64 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. --><project basedir="." default="build" name="TestApp">
-    <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="../../Downloads/eclipse"/>
-    <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
-    <path id="Android 5.1.1.libraryclasspath">
-        <pathelement location="../../android-sdks/platforms/android-22/android.jar"/>
-    </path>
-    <path id="Android Private Libraries.libraryclasspath">
-        <pathelement location="libs/android-support-v4.jar"/>
-    </path>
-    <path id="Android Dependencies.libraryclasspath"/>
-    <path id="TestApp.classpath">
-        <pathelement location="bin/classes"/>
-        <path refid="Android 5.1.1.libraryclasspath"/>
-        <path refid="Android Private Libraries.libraryclasspath"/>
-        <path refid="Android Dependencies.libraryclasspath"/>
-    </path>
-    <target name="init">
-        <mkdir dir="bin/classes"/>
-        <copy includeemptydirs="false" todir="bin/classes">
-            <fileset dir="src">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-        <copy includeemptydirs="false" todir="bin/classes">
-            <fileset dir="gen">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    <target name="clean">
-        <delete dir="bin/classes"/>
-    </target>
-    <target depends="clean" name="cleanall"/>
-    <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects"/>
-    <target depends="init" name="build-project">
-        <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin/classes" includeantruntime="false" source="${source}" target="${target}">
-            <src path="src"/>
-            <src path="gen"/>
-            <classpath refid="TestApp.classpath"/>
-        </javac>
-    </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
-    </target>
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="emma" basedir="../../.">
+
+	<!-- What project are you testing? -->
+	<property name="project.dir" value="/Users/GURU/workspace/TestApp"/>
+
+	<!-- Where should we output the results?-->
+	<property name="output.dir" value="D:/temp/emma_output"/>
+
+	<!-- Emma? Where are you? (Emma installation directory)-->
+	<property name='emma.dir' value='D:/downloads/emma-2.0.5312' />
+
+	<!------------------------------------------------------------->
+
+	<!-- Where are the class files? -->
+	<property name="bin" value="${project.dir}/bin"/>
+	<!-- EMMA distribution directory: -->
+	<path id='emma.lib' >
+		<fileset dir='${emma.dir}' includes='lib/*.jar' />
+	</path>
+	<taskdef resource='emma_ant.properties' classpathref='emma.lib' />
+
+	<!-- Target which instruments the class files -->
+	<target name="instr">
+		<mkdir dir="${output.dir}"/>
+		<emma>
+			<!-- instrumentation of bin folder -->
+			<instr instrpath="${bin}" mode="overwrite" outfile="${output.dir}/coverage.em"/>
+		</emma>
+		<!-- copy the emma classes into the bin folder -->
+		<unjar dest="${bin}" src="${emma.dir}/lib/emma.jar" overwrite="true"/>
+	</target>
+
+	<!-- This target copies your source files so they can be used for generation of
+			the reports later. -->
+	<property name="src.dir" value="${output.dir}/src" />
+	<target name="export-src">
+		<antcall target="cleanup"/>
+		<mkdir dir="${src.dir}" />
+		<copy todir="${src.dir}">
+			<fileset dir="${project.dir}/src">
+				<include name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Generate the report. -->
+	<target name="report">
+		<antcall target="export-src"/>
+		<emma>
+			<!-- creating a report -->
+			<report sort="+name,+class,+method,+block" sourcepath="${src.dir}">
+				<infileset dir="${output.dir}" includes="*.em, *.ec"/>
+				<html outfile="${output.dir}/index.html" depth="method" columns="name,class,method,block,line"/>
+			</report>
+		</emma>
+	</target>
+
+	<target name="cleanup">
+		<delete dir="${src.dir}" failonerror="false"/>
+
+	</target>
+
 </project>
