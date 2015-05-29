@@ -1,64 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="emma" basedir="../../.">
+<project name="TippyTipper" default="help">
 
-	<!-- What project are you testing? -->
-	<property name="project.dir" value="/Users/GURU/workspace/TestApp"/>
+    <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+    <property file="local.properties" />
 
-	<!-- Where should we output the results?-->
-	<property name="output.dir" value="D:/temp/emma_output"/>
+    <!-- The ant.properties file can be created by you. It is only edited by the
+         'android' tool to add properties to it.
+         This is the place to change some Ant specific build properties.
+         Here are some properties you may want to change/update:
 
-	<!-- Emma? Where are you? (Emma installation directory)-->
-	<property name='emma.dir' value='D:/downloads/emma-2.0.5312' />
+         source.dir
+             The name of the source directory. Default is 'src'.
+         out.dir
+             The name of the output directory. Default is 'bin'.
 
-	<!------------------------------------------------------------->
+         For other overridable properties, look at the beginning of the rules
+         files in the SDK, at tools/ant/build.xml
 
-	<!-- Where are the class files? -->
-	<property name="bin" value="${project.dir}/bin"/>
-	<!-- EMMA distribution directory: -->
-	<path id='emma.lib' >
-		<fileset dir='${emma.dir}' includes='lib/*.jar' />
-	</path>
-	<taskdef resource='emma_ant.properties' classpathref='emma.lib' />
+         Properties related to the SDK location or the project target should
+         be updated using the 'android' tool with the 'update' action.
 
-	<!-- Target which instruments the class files -->
-	<target name="instr">
-		<mkdir dir="${output.dir}"/>
-		<emma>
-			<!-- instrumentation of bin folder -->
-			<instr instrpath="${bin}" mode="overwrite" outfile="${output.dir}/coverage.em"/>
-		</emma>
-		<!-- copy the emma classes into the bin folder -->
-		<unjar dest="${bin}" src="${emma.dir}/lib/emma.jar" overwrite="true"/>
-	</target>
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems.
 
-	<!-- This target copies your source files so they can be used for generation of
-			the reports later. -->
-	<property name="src.dir" value="${output.dir}/src" />
-	<target name="export-src">
-		<antcall target="cleanup"/>
-		<mkdir dir="${src.dir}" />
-		<copy todir="${src.dir}">
-			<fileset dir="${project.dir}/src">
-				<include name="**/*.java"/>
-			</fileset>
-		</copy>
-	</target>
+         -->
+    <property file="ant.properties" />
 
-	<!-- Generate the report. -->
-	<target name="report">
-		<antcall target="export-src"/>
-		<emma>
-			<!-- creating a report -->
-			<report sort="+name,+class,+method,+block" sourcepath="${src.dir}">
-				<infileset dir="${output.dir}" includes="*.em, *.ec"/>
-				<html outfile="${output.dir}/index.html" depth="method" columns="name,class,method,block,line"/>
-			</report>
-		</emma>
-	</target>
+    <!-- if sdk.dir was not set from one of the property file, then
+         get it from the ANDROID_HOME env var.
+         This must be done before we load project.properties since
+         the proguard config can use sdk.dir -->
+    <property environment="env" />
+    <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+        <isset property="env.ANDROID_HOME" />
+    </condition>
 
-	<target name="cleanup">
-		<delete dir="${src.dir}" failonerror="false"/>
+    <!-- The project.properties file is created and updated by the 'android'
+         tool, as well as ADT.
 
-	</target>
+         This contains project specific properties such as project target, and library
+         dependencies. Lower level build properties are stored in ant.properties
+         (or in .classpath for Eclipse projects).
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems. -->
+    <loadproperties srcFile="project.properties" />
+
+    <!-- quick check on sdk.dir -->
+    <fail
+            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
+            unless="sdk.dir"
+    />
+
+    <!--
+        Import per project custom build rules if present at the root of the project.
+        This is the place to put custom intermediary targets such as:
+            -pre-build
+            -pre-compile
+            -post-compile (This is typically used for code obfuscation.
+                           Compiled code location: ${out.classes.absolute.dir}
+                           If this is not done in place, override ${out.dex.input.absolute.dir})
+            -post-package
+            -post-build
+            -pre-clean
+    -->
+    <import file="custom_rules.xml" optional="true" />
+
+    <!-- Import the actual build file.
+
+         To customize existing targets, there are two options:
+         - Customize only one target:
+             - copy/paste the target into this file, *before* the
+               <import> task.
+             - customize it to your needs.
+         - Customize the whole content of build.xml
+             - copy/paste the content of the rules files (minus the top node)
+               into this file, replacing the <import> task.
+             - customize to your needs.
+
+         ***********************
+         ****** IMPORTANT ******
+         ***********************
+         In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
+         in order to avoid having your file be overridden by tools such as "android update project"
+    -->
+    <!-- version-tag: 1 -->
+    <import file="${sdk.dir}/tools/ant/build.xml" />
 
 </project>
