@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="TippyTipper" default="help">
+<project name="TestApp" default="help">
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
@@ -88,5 +88,38 @@
     -->
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
+    
+    <!-- root directory for the example source code: --> 
+  	<property name="src.dir" value="${basedir}/src" />
+
+  	<!-- javac class output directory: -->
+  	<property name="out.dir" value="${basedir}/out" />
+  	
+  	<!-- output directory used for EMMA coverage reports: -->
+  	<property name="coverage.dir" value="${basedir}/bin" />
+
+  	<target name="init" >
+    	<mkdir dir="${out.dir}" />
+    	<path id="run.classpath" >
+      	<pathelement location="${out.dir}" />
+    	</path>
+  	</target>
+
+  	<target name="compile" depends="init" description="compiles the example source code" >
+    	<javac debug="on" srcdir="${src.dir}" destdir="${out.dir}" />
+  	</target>
+
+  	<target name="emma" description="turns on EMMA's on-the-fly instrumentation mode" >
+    	<property name="emma.enabled" value="true" />
+  	</target>
+  
+  	<target name="run" depends="init, compile" description="runs the examples" >
+    	<emmajava enabled="${emma.enabled}" libclasspathref="emma.lib" 
+              classname="Main"
+              classpathref="run.classpath">
+      		<filter includes="Main, search.*" />
+      		<txt outfile="${coverage.dir}/coverage.em" />
+    	</emmajava>
+  	</target>
 
 </project>
