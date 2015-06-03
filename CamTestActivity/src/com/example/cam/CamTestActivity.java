@@ -1,9 +1,5 @@
 package com.example.cam;
 
-/**
- * @author Jose Davis Nidhin
- */
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -116,8 +112,13 @@ public class CamTestActivity extends Activity {
 	}
 
 	private void resetCam() {
+		try{
 		camera.startPreview();
 		preview.setCamera(camera);
+		}
+		catch (Exception e) {
+			
+		}
 	}
 
 	private void refreshGallery(File file) {
