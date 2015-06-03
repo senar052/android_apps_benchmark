@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.util.Log;
 
 import java.util.List;
 
@@ -46,8 +47,14 @@ public class SendToAnotherApp extends Activity {
 // Start an activity if it's safe
                     if (isIntentSafe) {
                         startActivity(mapIntent);
+                        Log.d("Intent is safe, ", "Sending user to maps");
                     }
-
+                    else{
+                    	Log.d("Failed to create a safe intent, ", "Did not send to Maps");
+                    }
+                }
+                else{
+                	Log.d("Address is Empty ", "Intent can not be created");
                 }
             }
         });
