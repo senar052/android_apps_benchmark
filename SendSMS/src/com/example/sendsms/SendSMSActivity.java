@@ -8,6 +8,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
 
 public class SendSMSActivity extends Activity {
 
@@ -35,9 +36,11 @@ public class SendSMSActivity extends Activity {
                 try {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(phoneNo, null, sms, null, null);
+                    Log.d("SMS Sent!");
                     Toast.makeText(getApplicationContext(), "SMS Sent!",
                             Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
+                    Log.d("SMS faild, please try again later!");
                     Toast.makeText(getApplicationContext(),
                             "SMS faild, please try again later!",
                             Toast.LENGTH_LONG).show();
