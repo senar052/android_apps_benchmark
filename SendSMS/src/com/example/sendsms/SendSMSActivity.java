@@ -36,11 +36,11 @@ public class SendSMSActivity extends Activity {
                 try {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(phoneNo, null, sms, null, null);
-                    Log.d("SMS Sent!");
                     Toast.makeText(getApplicationContext(), "SMS Sent!",
-                            Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
+                    Log.d("SMS Sent!: ", sms);
                 } catch (Exception e) {
-                    Log.d("SMS faild, please try again later!");
+                    Log.d("SMS failed, ", "please try again later!");
                     Toast.makeText(getApplicationContext(),
                             "SMS faild, please try again later!",
                             Toast.LENGTH_LONG).show();
